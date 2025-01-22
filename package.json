@@ -1,10 +1,12 @@
 {
   "name": "spotify-playlist-to-csv",
   "dependencies": {
+    "json2csv": "^6.0.0-alpha.2",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.2",
     "react-scripts": "^5.0.1",
+    "spotify-web-api-node": "^5.0.2",
     "styled-components": "^6.1.14"
   },
   "scripts": {
