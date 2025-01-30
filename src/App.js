@@ -3,8 +3,8 @@ import React from 'react';
 
 // Component Imports
 import getTracklist from './spotify-scripts/getTracklist';
+import getAccessToken from './spotify-scripts/getAccessToken';
 import StandardButton from './components/StandardButton';
-import { generateRandomString, generateCodeChallenge } from './spotify-scripts/codeChallengeVerifier'
 
 const App = () => {
     return (
@@ -13,6 +13,7 @@ const App = () => {
             <p>Hello world</p>
 
             <StandardButton onClick={getTracklist}>Get Track List</StandardButton>
+            <StandardButton onClick={getAccessToken}>Get Access Token</StandardButton>
             
         </div>
     )

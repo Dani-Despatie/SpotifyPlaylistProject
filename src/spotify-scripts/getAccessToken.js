@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 const clientId = '5dbe95f97d7443caaecf8e5ad77efe6b';
 const redirectUri = 'https://spotify-playlist-project-murex.vercel.app/callback';
 const scopes = 'playlist-read-private';
@@ -24,14 +22,29 @@ function generateCodeChallenge(codeVerifier) {
         .replace(/=+$/, '');
     });
 }
-// Function to get URL parameters
+
 function getParams() {
     const params = new URLSearchParams(window.location.search);
     return params;
 }
 
-// Get Access Token ;.;
 async function getAccessToken(code) {
+
+    // Logging in user
+    const randomString = generateRandomString(64);
+    const codeChallenge = await generateCodeChallenge(randomString);
+    const authUrl = `${authEndpoint}?response_type=${responseType}&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
+
+    window.location.href = authUrl; 
+    const params = getParams();
+    if (!params.code) {
+        console.log('Error: no code in params');
+        return;
+    }
+
+    const accessToken = await getAccessToken(params.code);
+    const playlistId = '2BlAFB6iFQd3HrGwGmOpSo?si=KZgCaYD1Q0q468RO20bSqQ&pi=nQpFYP97R06N1';
+
     const res = await fetch('https://accounts.spotify.com/api/token', {
         method: 'POST',
         headers: {'Content-Type': 'application/x-www-form-urlencoded'},
@@ -44,35 +57,7 @@ async function getAccessToken(code) {
         })
     });
     const token = await res.json().access_token;
-    return token;
+    console.log(token);
 }
 
-
-// Final function to get track list
-async function getTrackList() {
-    // Setting up user sign in
-    const randomString = generateRandomString(64);
-    const codeChallenge = await generateCodeChallenge(randomString);
-    const authUrl = `${authEndpoint}?response_type=${responseType}&client_id=${clientId}&scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri)}&code_challenge_method=S256&code_challenge=${codeChallenge}`;
-
-    // Signing in user
-    window.location.href = authUrl; 
-    const params = getParams();
-    if (!params.code) {
-        console.log('Error: no code in params');
-        return;
-    }
-    
-    const accessToken = await getAccessToken(params.code);
-    const playlistId = '2BlAFB6iFQd3HrGwGmOpSo?si=KZgCaYD1Q0q468RO20bSqQ&pi=nQpFYP97R06N1';
-    
-    // Fetching the tracks from playlist
-    const res = await fetch(`https://api.spotify.com/v1/playlists/${playlistId}/tracks`, {
-        headers: {'Authorization': `Bearer ${accessToken}`}
-    });
-    const data = await res.json();
-    console.log(data);
-    
-}
-
-export default getTrackList;
+export default getAccessToken;
