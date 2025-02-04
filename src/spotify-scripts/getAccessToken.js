@@ -1,10 +1,10 @@
 const clientId = '5dbe95f97d7443caaecf8e5ad77efe6b';
-const redirectUri = 'http://localhost:3000/callback';
 const scopes = 'user-read-private user-read-email';
 const authEndpoint = 'https://accounts.spotify.com/authorize';
 const tokenEndpoint = 'https://accounts.spotify.com/api/token';
 const responseType = 'code';
 const devmode = process.env.NODE_ENV;
+const redirectUri = devmode == 'development' ? 'http://localhost:3000/callback' : 'https://spotify-playlist-project-murex.vercel.app/callback';
 
 
 async function getAccessToken() {
