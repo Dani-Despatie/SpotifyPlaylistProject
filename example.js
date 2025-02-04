@@ -1,5 +1,5 @@
-const clientId = 'your_client_id';
-const redirectUri = 'http://localhost:8888/callback';
+const clientId = '5dbe95f97d7443caaecf8e5ad77efe6b';
+const redirectUri = 'http://localhost:3000/callback';
 const scopes = 'playlist-read-private';
 const authEndpoint = 'https://accounts.spotify.com/authorize';
 const responseType = 'code';
@@ -15,6 +15,7 @@ function generateRandomString(length) {
 }
 
 const codeVerifier = generateRandomString(128);
+const test = new URL()
 
 function generateCodeChallenge(codeVerifier) {
   return crypto.subtle.digest('SHA-256', new TextEncoder().encode(codeVerifier)).then(buffer => {

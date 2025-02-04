@@ -1,6 +1,8 @@
 {
   "name": "spotify-playlist-to-csv",
   "dependencies": {
+    "cors-anywhere": "^0.4.4",
+    "curl": "^0.1.4",
     "dotenv": "^16.4.7",
     "json2csv": "^6.0.0-alpha.2",
     "react": "^19.0.0",

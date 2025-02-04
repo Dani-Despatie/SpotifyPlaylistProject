@@ -1,21 +1,22 @@
 import GlobalStyles from './GlobalStyles';
 import React from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
 // Component Imports
-import getTracklist from './spotify-scripts/getTracklist';
-import getAccessToken from './spotify-scripts/getAccessToken';
-import StandardButton from './components/StandardButton';
+import Login from './pages/Login';
+import Main from './pages/Main';
 
 const App = () => {
     return (
-        <div>
+        <Router>
             <GlobalStyles/>
-            <p>Hello world</p>
 
-            <StandardButton onClick={getTracklist}>Get Track List</StandardButton>
-            <StandardButton onClick={getAccessToken}>Get Access Token</StandardButton>
-            
-        </div>
+            <Routes>
+                <Route path='/' element={<Login/>} />
+                <Route path='/Callback' element={<Main />} />
+            </Routes>
+
+        </Router>
     )
 }
 
