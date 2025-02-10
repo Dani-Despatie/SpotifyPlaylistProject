@@ -11,6 +11,10 @@ const GlobalStyles = createGlobalStyle`
         color: white;
         font-size: 1.4em;
     }
+
+    .errorMessage {
+        color: lightcoral;
+    }
 `;
 
 export default GlobalStyles;
