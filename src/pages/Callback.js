@@ -2,13 +2,13 @@ import React from 'react';
 
 // Component Imports
 import StandardButton from '../components/StandardButton';
-import callback from '../spotify-scripts/callback';
+import getAccessToken from '../spotify-scripts/getAccessToken';
 
 function Main() {
-    callback();
+    getAccessToken();
     return (
         <div>
-            <p>Loading... Please wait</p>
+            <p>Loading...</p>
         </div>
     )
 }

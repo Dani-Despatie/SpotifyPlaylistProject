@@ -7,20 +7,33 @@ import authorization from '../spotify-scripts/authorization';
 import getPlaylist from '../spotify-scripts/getPlaylist';
 
 
-function Login() {
+function Main() {
     const [songList, setSongList] = useState(null);
     const [link, setLink] = useState(null);
     const [downloadLink, setDownloadLink] = useState(null);
     const [errMessage, setErrMessage] = useState(null);
+    const [token, setToken] = useState(null);
 
-    authorization();
-    const token = window.localStorage.getItem('token').split('&')[0];
+    // Gets token if it exists or calls for authorization
+    useEffect(() => {
+        function getToken() {
+            const token = window.localStorage.getItem('access_token');
+            if (token) {
+                setToken(token);
+                console.log('token found');
+            }
+            else {
+                authorization();
+                console.log('No token found');
+            }
+        }
+        getToken();
+    }, [])
 
-    // This allows us to use an async function within the front-end code
+    // Gets the list of songs OR identifies errors
     useEffect(() => {
         async function songListSetter () {
             const songs = await getPlaylist(token, link);
-
             if (typeof(songs) == 'object') {
                 setErrMessage(songs.message);
             }
@@ -33,12 +46,13 @@ function Login() {
         }
     }, [link])
 
-    // Submit handler
+    // Submit handler for the playlist link
     function submitHandler() {
         event.preventDefault();
         setLink(event.target.playlistUrl.value);
     }
 
+    // Creates the download link
     useEffect(() => {
         function downloadBlob(content) {
             const blob = new Blob([content], {type: 'text/csv;charset=utf-8;'});
@@ -64,11 +78,11 @@ function Login() {
             {downloadLink && !errMessage && <a href={downloadLink} download='SpotifyPlaylist'>Download CSV</a>}
 
             <div className='errorMessage'>
-                {errMessage && <p>{errMessage}</p>}
+                {errMessage && <p>Error: {errMessage}</p>}
             </div>
 
         </div>
     )
 }
 
-export default Login;
+export default Main;

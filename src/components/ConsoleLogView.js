@@ -4,7 +4,10 @@ import styled from 'styled-components';
 
 function ConsoleLogView() {
     const logs = localStorage.getItem('logs');
-    const logArray = logs.split("\n");
+    const logArray = [];
+    if (logs) {
+        logArray = logs.split("\n");
+    }
 
     return (
         <Container>
