@@ -18,18 +18,17 @@ async function getPlaylist(token, url) {
         const tokenTime = window.localStorage.getItem('token_time');
         const time = Date.now();
         if (tokenTime && time - tokenTime > 3300000) {
-            console.log('Token refresh started...');
-            await getRefreshToken();
-            finalToken = window.localStorage.getItem('access_token');
-            console.log('Token refreshed successfully');
+            const newToken = await getRefreshToken();
+            finalToken = newToken.token;
         }
 
         const res = await fetch(apiUrl, {
             headers:{
-                'Authorization': `Bearer ${token}`
+                'Authorization': `Bearer ${finalToken}`
             }
         });
-        // Doing a manual check of res since errors here are shown in console without being thrown
+
+        // Doing a manual check of res since errors here don't trigger the catch
         if (res.ok == false) {
             throw {status: res.status, message: res.statusText};
         }
@@ -62,10 +61,10 @@ async function getPlaylist(token, url) {
         };
     } catch (err) {
         if (err.status == 404) {
-            return {status: 404, message: 'Playlist not found. Check link is correct and playlist is not private'};
+            return {status: 404, message: 'Playlist not found. Check link is correct and playlist is set to public'};
         }
         else if (err.message.length == 0 && playlistId.length !== 22) { // This deals with playlist ID being wrong - which returns no error message
-            return {status: err.status, message: 'Something is wrong with the link - Playlist ID may have wrong number of digits'};
+            return {status: err.status, message: 'Something is wrong with the link - Playlist ID may be incorrect'};
         }
 
         else {

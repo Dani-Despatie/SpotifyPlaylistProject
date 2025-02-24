@@ -33,7 +33,6 @@ async function callback() {
       window.localStorage.setItem('access_token', data.access_token);
       window.localStorage.setItem('refresh_token', data.refresh_token);
       window.localStorage.setItem('token_time', Date.now());
-      console.log('token stored');
     }
 
     window.location = '/';

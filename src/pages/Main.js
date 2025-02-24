@@ -23,11 +23,9 @@ function Main() {
             const token = window.localStorage.getItem('access_token');
             if (token) {
                 setToken(token);
-                console.log('token found');
             }
             else {
                 authorization();
-                console.log('No token found');
             }
         }
         getToken();
@@ -39,6 +37,9 @@ function Main() {
             const songs = await getPlaylist(token, link);
             if (!songs.title) {
                 setErrMessage(songs.message);
+                setSongList(null);
+                setPlaylistName(null);
+                setDownloadLink(null);
             }
             else {
                 setSongList(songs.songs);
@@ -57,9 +58,23 @@ function Main() {
         setLink(event.target.playlistUrl.value);
         if (!event.target.playlistUrl.value) {
             setErrMessage('Please provide a link to the desired playlist');
+            setPlaylistName(null);
+            setSongList(null);
+            setDownloadLink(null);
         }
         else {
             setErrMessage(null);
+        }
+    }
+
+    // Show instructions button
+    function showInstructionsHandler() {
+        event.preventDefault();
+        if (showInstructions) {
+            setShowInstructions(false);
+        }
+        else {
+            setShowInstructions(true);
         }
     }
 
@@ -78,14 +93,21 @@ function Main() {
 
     return (
         <div className='container'>
-            <h2>Have a playlist you want as CSV?</h2>
+            <h2>Have a playlist you want in Excel?</h2>
             <p>
-                Input the a link to the playlist here, and we'll 
+                Input the a link to the playlist, and we'll do the conversion dance
             </p>
             <form onSubmit={submitHandler} className='playlist-form'>
                 <label htmlFor='playlistUrl'>Paste link here:</label>
-                <input type='url' id='playlistUrl' className='url-input' /> 
-                <StandardButton type='submit'>Get CSV</StandardButton>
+                <div className = 'input'>
+                    <input type='url' id='playlistUrl' className='url-input' />
+                    <button className = 'instr-button' type = 'button' onClick = {showInstructionsHandler}>?</button>
+                </div>
+
+                <div className = ''>
+                    <StandardButton type='submit'>Get CSV</StandardButton>
+                    {status == 'loading' && <p>Loading...</p>}
+                </div>
             </form>
 
             <div className='download'>
@@ -94,6 +116,26 @@ function Main() {
 
             <div className='errorMessage'>
                 {errMessage && <p>Error: {errMessage}</p>}
+            </div>
+
+            <div className = 'instructions' hidden = {!showInstructions}>
+                <h3>How to find the playlist link:</h3>
+                <ol>
+                    <li>Go into Spotify and select the desired playlist.</li>
+                    <li>Press the button for "Options" above where the tracks are listed - it should look like three dots</li>
+                    <li>Press the "Share" option (or hover mouse over on computer)</li>
+                    <li>Press "Copy link" (or "Copy link to playlist" on computer)</li>
+                </ol>
+                <p>You should now be able to paste this link into the input bar above.</p>
+
+                <h3>How to make a playlist public:</h3>
+                <ol>
+                    <li>Go into Spotify and select the desired playlist</li>
+                    <li>Press the button for "Options" above where the tracks are listed - it should look like three dots</li>
+                    <li>
+                        Press "Make public" - if this option is not available or says "Make private" instead, the playlist is already public
+                    </li>
+                </ol>
             </div>
 
         </div>

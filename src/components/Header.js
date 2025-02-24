@@ -11,10 +11,15 @@ function Header() {
 export default Header;
 
 const HeaderComponent = styled.div`
-    position: sticky;
+    position: relative;
     margin: 8px 0px;
-    width: 100%;
-
+    width: calc(100% - 24px);
+    max-height: 360px;
+    padding: 8px 20px;
+    top: -8px;
+    left: -8px;
+    background-color: var(--banner-background);
+    border-bottom: 1px solid black;
+    
     text-align: center;
-    border: 1px solid pink;
 `;
