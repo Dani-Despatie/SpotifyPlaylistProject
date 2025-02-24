@@ -1,5 +1,5 @@
 const cliendId = '5dbe95f97d7443caaecf8e5ad77efe6b';
-const redirectUri = 'http://localhost:3000/callback';
+const redirectUri = 'https://spotify-playlist-project-murex.vercel.app/callback';
 const authEndpoint = new URL('https://accounts.spotify.com/authorize');
 const scope = 'user-read-private';
 

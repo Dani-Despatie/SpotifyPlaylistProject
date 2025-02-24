@@ -27,6 +27,7 @@ async function getPlaylist(token, url) {
                 'Authorization': `Bearer ${finalToken}`
             }
         });
+        console.log(res);
 
         // Doing a manual check of res since errors here don't trigger the catch
         if (res.ok == false) {
