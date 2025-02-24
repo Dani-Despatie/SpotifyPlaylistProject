@@ -21,7 +21,7 @@ function Main() {
     useEffect(() => {
         function getToken() {
             const token = window.localStorage.getItem('access_token');
-            if (token) {
+            if (token && token !== 'undefined') {
                 setToken(token);
             }
             else {
@@ -95,7 +95,7 @@ function Main() {
         <div className='container'>
             <h2>Have a playlist you want in Excel?</h2>
             <p>
-                Input the a link to the playlist, and we'll do the conversion dance
+                Input the a link to the playlist, and we'll do the conversion dance!
             </p>
             <form onSubmit={submitHandler} className='playlist-form'>
                 <label htmlFor='playlistUrl'>Paste link here:</label>
