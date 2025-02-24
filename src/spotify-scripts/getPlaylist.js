@@ -14,11 +14,12 @@ async function getPlaylist(token, url) {
             throw {status: 400, message: 'Link must be to a Spotify playlist, not an individual song/artist/etc.'};
         }
 
-        // Checking time for last token
+        // Getting refresh token if token is likely to be expired
         const tokenTime = window.localStorage.getItem('token_time');
         const time = Date.now();
-        if (tokenTime && tokenTime + 3300000 < time) {
-            getRefreshToken();
+        if (tokenTime && time - tokenTime > 3300000) {
+            console.log('Token refresh started...');
+            await getRefreshToken();
             finalToken = window.localStorage.getItem('access_token');
             console.log('Token refreshed successfully');
         }
@@ -55,7 +56,10 @@ async function getPlaylist(token, url) {
             songs += `"${song.track.name}", "${artists}", ${minutes}:${seconds} \r\n`;
         });
 
-        return songs;
+        return {
+            title: data.name,
+            songs
+        };
     } catch (err) {
         if (err.status == 404) {
             return {status: 404, message: 'Playlist not found. Check link is correct and playlist is not private'};

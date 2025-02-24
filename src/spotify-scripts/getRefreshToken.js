@@ -27,9 +27,8 @@ async function getRefreshToken() {
       window.localStorage.setItem('access_token', data.access_token);
       window.localStorage.setItem('refresh_token', data.refresh_token);
       window.localStorage.setItem('token_time', Date.now())
+      console.log('Refresh Token acquired successfully');
     }
-
-    console.log('Refresh Token acquired successfully');
 }
 
 export default getRefreshToken;

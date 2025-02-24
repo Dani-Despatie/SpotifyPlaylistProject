@@ -7,7 +7,7 @@ import getAccessToken from '../spotify-scripts/getAccessToken';
 function Main() {
     getAccessToken();
     return (
-        <div>
+        <div className='container'>
             <p>Loading...</p>
         </div>
     )
