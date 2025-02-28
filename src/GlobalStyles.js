@@ -37,7 +37,7 @@ const GlobalStyles = createGlobalStyle`
     }
 
     .url-input {
-        width: 50%;
+        width: 70%;
         min-width: 460px;
         font-size: 0.8em;
         padding: 6px 12px;
