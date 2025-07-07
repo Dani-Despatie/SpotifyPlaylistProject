@@ -27,9 +27,10 @@ async function getRefreshToken() {
       window.localStorage.setItem('access_token', data.access_token);
       window.localStorage.setItem('refresh_token', data.refresh_token);
       window.localStorage.setItem('token_time', Date.now())
+      return {token: data.access_token, refresh: data.refresh_token};
     }
 
-    return {token: data.access_token, refresh: data.refresh_token};
+    return ("A problem occurred getting new tokens");
 }
 
 export default getRefreshToken;

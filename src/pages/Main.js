@@ -10,7 +10,6 @@ import getPlaylist from '../spotify-scripts/getPlaylist';
 
 function Main() {
     const [songList, setSongList] = useState(null);
-    const [link, setLink] = useState(null);
     const [downloadLink, setDownloadLink] = useState(null);
     const [errMessage, setErrMessage] = useState(null);
     const [token, setToken] = useState(null);
@@ -19,56 +18,47 @@ function Main() {
 
     // Gets token if it exists or calls for authorization
     useEffect(() => {
+        console.log("Getting Token...")
         function getToken() {
             const token = window.localStorage.getItem('access_token');
             if (token && token !== 'undefined') {
                 setToken(token);
             }
             else {
+                console.log("No token discovered, performing authorization");
                 authorization();
             }
         }
         getToken();
+        console.log("Token acquired and ok");
     }, [])
 
-    // Gets the list of songs OR identifies errors
-    useEffect(() => {
-        async function songListSetter () {
-            const songs = await getPlaylist(token, link);
-            if (!songs.title) {
-                setErrMessage(songs.message);
-                setSongList(null);
-                setPlaylistName(null);
-                setDownloadLink(null);
-            }
-            else {
-                setSongList(songs.songs);
-                setPlaylistName(songs.title);
-                setErrMessage(null);
-            }
-        }
-        if (link) {
-            songListSetter();
-        }
-    }, [link])
-
     // Submit handler for the playlist link
-    function submitHandler() {
+    async function submitHandler(event) {
         event.preventDefault();
-        setLink(event.target.playlistUrl.value);
-        if (!event.target.playlistUrl.value) {
+        setDownloadLink(null);
+        setSongList(null);
+        setPlaylistName(null);
+        const link = event.target.playlistUrl.value;
+        console.log("Link received: ", link);
+        if (!link) {
             setErrMessage('Please provide a link to the desired playlist');
-            setPlaylistName(null);
-            setSongList(null);
-            setDownloadLink(null);
+            return;
         }
-        else {
-            setErrMessage(null);
+        
+        setErrMessage(null);
+        const songs = await getPlaylist(token, link);
+        if (!songs.title) {
+            setErrMessage(songs.message);
+            return;
         }
+        setSongList(songs.songs);
+        setPlaylistName(songs.title);
+        setErrMessage(null);
     }
 
     // Show instructions button
-    function showInstructionsHandler() {
+    function showInstructionsHandler(event) {
         event.preventDefault();
         if (showInstructions) {
             setShowInstructions(false);
@@ -85,9 +75,13 @@ function Main() {
             const url = URL.createObjectURL(blob);
 
             setDownloadLink(url);
+            console.log("New download blob created");
         }
         if (songList) {
             downloadBlob(songList);
+        }
+        else {
+            console.log("songList altered without new blob");
         }
     }, [songList]);
 

@@ -6,6 +6,7 @@ async function getPlaylist(token, url) {
     let finalToken = token;
 
     try {
+        console.log("Validating playlist link...");
         // Link validation
         if (!url || !url.includes('open.spotify.com')) {
             throw {status: 400, message: 'Link must be to a Spotify playlist, not another service/website.'};
@@ -18,8 +19,10 @@ async function getPlaylist(token, url) {
         const tokenTime = window.localStorage.getItem('token_time');
         const time = Date.now();
         if (tokenTime && time - tokenTime > 3300000) {
+            console.log("Token expired, getting new token");
             const newToken = await getRefreshToken();
             finalToken = newToken.token;
+            console.log("New token successfully acquired");
         }
 
         const res = await fetch(apiUrl, {
@@ -33,10 +36,12 @@ async function getPlaylist(token, url) {
         if (res.ok == false) {
             throw {status: res.status, message: res.statusText};
         }
+        console.log("Fetch OK! Parsing playlist data...");
         const data = await res.json();
         const songData = data.tracks.items;
         
         let songs = '';
+        let totalLength = 0;
         songData.forEach((song) => {
             // Getting artist names as a single string
             let artists = '';
@@ -54,7 +59,11 @@ async function getPlaylist(token, url) {
                 seconds = `0${seconds}`;
 
             songs += `"${song.track.name}", "${artists}", ${minutes}:${seconds} \r\n`;
+            totalLength += song.track.duration_ms;
         });
+
+        songs += `\r\n "", "Total Duration", "${msToString(totalLength)}"`;
+        console.log("Playlist data parsed");
 
         return {
             title: data.name,
@@ -72,6 +81,19 @@ async function getPlaylist(token, url) {
             return {status: err.status, message: err.message};
         }
     }
+}
+
+function msToString(ms) {
+    let hrs = Math.floor(ms/1000/60/60);
+    let mins = Math.floor(ms/1000/60 - 60 * hrs);
+    let secs = Math.round(ms/1000 - 60 * mins - 60 * 60 * hrs);
+
+    if (mins < 10)
+        mins = `0${mins}`;
+    if (secs < 10)
+        secs = `10${secs}`;
+
+    return(`${hrs}:${mins}:${secs}`);
 }
 
 export default getPlaylist;

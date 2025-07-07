@@ -6,6 +6,7 @@
     "curl": "^0.1.4",
     "dotenv": "^16.4.7",
     "json2csv": "^6.0.0-alpha.2",
+    "path-browserify": "^1.0.1",
     "pkce-challenge": "^4.1.0",
     "query-string": "^9.1.1",
     "react": "^19.0.0",
