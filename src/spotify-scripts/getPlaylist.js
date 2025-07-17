@@ -15,31 +15,10 @@ async function getPlaylist(token, url) {
             throw {status: 400, message: 'Link must be to a Spotify playlist, not an individual song/artist/etc.'};
         }
 
-        // Getting refresh token if token is likely to be expired
-        const tokenTime = window.localStorage.getItem('token_time');
-        const time = Date.now();
-        if (tokenTime && time - tokenTime > 3300000) {
-            console.log("Token expired, getting new token");
-            const newToken = await getRefreshToken();
-            finalToken = newToken.token;
-            console.log("New token successfully acquired");
-        }
-
-        const res = await fetch(apiUrl, {
-            headers:{
-                'Authorization': `Bearer ${finalToken}`
-            }
-        });
-        console.log(res);
-
-        // Doing a manual check of res since errors here don't trigger the catch
-        if (res.ok == false) {
-            throw {status: res.status, message: res.statusText};
-        }
-        console.log("Fetch OK! Parsing playlist data...");
-        const data = await res.json();
+        // Getting playlist data
+        const data = await fetchPlaylist(finalToken, apiUrl, 0);
         const songData = data.tracks.items;
-        
+
         let songs = '';
         let totalLength = 0;
         songData.forEach((song) => {
@@ -53,16 +32,11 @@ async function getPlaylist(token, url) {
                 }
             }
 
-            const minutes = Math.floor(song.track.duration_ms/1000/60);
-            let seconds = Math.round((song.track.duration_ms/1000/60 - minutes) * 60);
-            if (seconds < 10) 
-                seconds = `0${seconds}`;
-
-            songs += `"${song.track.name}", "${artists}", ${minutes}:${seconds} \r\n`;
+            songs += `"${song.track.name}", "${artists}", ${msToString(song.track.duration_ms, 1)} \r\n`;
             totalLength += song.track.duration_ms;
         });
 
-        songs += `\r\n "", "Total Duration", "${msToString(totalLength)}"`;
+        songs += `\r\n "", "Total Duration", "${msToString(totalLength, 2)}"`;
         console.log("Playlist data parsed");
 
         return {
@@ -83,17 +57,71 @@ async function getPlaylist(token, url) {
     }
 }
 
-function msToString(ms) {
-    let hrs = Math.floor(ms/1000/60/60);
-    let mins = Math.floor(ms/1000/60 - 60 * hrs);
-    let secs = Math.round(ms/1000 - 60 * mins - 60 * 60 * hrs);
+function msToString(ms, numColons) {
+    let hrs, mins, secs;
+    // Seconds only
+    if (numColons == 0) {
+        secs = Math.floor(ms/1000);
+        
+        return (`${secs}`);
+    }
+    // Includes minutes
+    if (numColons == 1) {
+        mins = Math.floor(ms/1000/60);
+        secs = Math.round(ms/1000 - 60 * mins);
 
-    if (mins < 10)
-        mins = `0${mins}`;
-    if (secs < 10)
-        secs = `10${secs}`;
+        if (mins < 10)
+            mins = `0${mins}`;
+        if (secs < 10)
+            secs = `0${secs}`;
 
-    return(`${hrs}:${mins}:${secs}`);
+        return (`${mins}:${secs}`);
+    }
+    // Includes hours
+    if (numColons == 2) {
+        hrs = Math.floor(ms/1000/60/60);
+        mins = Math.floor(ms/1000/60 - 60 * hrs);
+        secs = Math.round(ms/1000 - 60 * mins - 60 * 60 * hrs);
+
+        if (mins < 10)
+            mins = `0${mins}`;
+        if (secs < 10)
+            secs = `0${secs}`;
+
+        return (`${hrs}:${mins}:${secs}`);
+    }
+
+    console.log("Improbable numColons value - reasses");
+    return null;
+}
+
+async function fetchPlaylist(token, apiUrl, attempt) {
+    const res = await fetch(apiUrl, {
+        headers: {
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    console.log(res);
+
+    // Returning data on success
+    if (res.status === 200) {
+        return await res.json();
+    }
+
+    // Dealing with errors on failure
+    const message = await res.text();
+    if (message.includes("expired")) {
+        if (attempt < 1) {
+            console.log("Token expired - getting new token...");
+            const tokenData = await getRefreshToken();
+            return fetchPlaylist(tokenData.token, apiUrl, attempt+1);
+        }
+        throw { status: res.status, message: "Token expired - refresh unsuccessful" };
+    }
+    
+    else {
+        throw { status: res.status, message: message };
+    }
 }
 
 export default getPlaylist;

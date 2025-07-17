@@ -21,16 +21,17 @@ async function getRefreshToken() {
         }),
     }
     const res = await fetch(url, payload);
-    const data = await res.json();
-
-    if (data) {
-      window.localStorage.setItem('access_token', data.access_token);
-      window.localStorage.setItem('refresh_token', data.refresh_token);
-      window.localStorage.setItem('token_time', Date.now())
-      return {token: data.access_token, refresh: data.refresh_token};
+    if (res.status !== 200) {
+      const message = await res.text();
+      throw { status: res.status, message: message  };
     }
 
-    return ("A problem occurred getting new tokens");
-}
+    const data = await res.json();
+    
+    window.localStorage.setItem('access_token', data.access_token);
+    window.localStorage.setItem('refresh_token', data.refresh_token);
+    window.localStorage.setItem('token_time', Date.now())
+    return {token: data.access_token, refresh: data.refresh_token};
+  }
 
 export default getRefreshToken;
