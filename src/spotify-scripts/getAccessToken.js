@@ -1,5 +1,3 @@
-import axios from "axios";
-
 const DEVMODE = false;
 const cliendId = '5dbe95f97d7443caaecf8e5ad77efe6b';
 const redirectUri = DEVMODE ? 'http://localhost:3000/callback': 'https://spotify-playlist-project-murex.vercel.app/callback';

@@ -6,6 +6,7 @@ async function getPlaylist(token, url) {
     let finalToken = token;
 
     try {
+        console.log("Current token being used: ", token);
         console.log("Validating playlist link...");
         // Link validation
         if (!url || !url.includes('open.spotify.com')) {
