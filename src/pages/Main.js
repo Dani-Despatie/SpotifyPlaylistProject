@@ -47,7 +47,7 @@ function Main() {
         }
         
         setErrMessage(null);
-        const songs = await getPlaylist(token, link);
+        const songs = await getPlaylist(token, link, setToken);
         if (!songs.title) {
             setErrMessage(songs.message);
             return;

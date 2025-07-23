@@ -1,12 +1,12 @@
 import getRefreshToken from "./getRefreshToken";
 
-async function getPlaylist(token, url) {
+async function getPlaylist(token, url, setToken) {
     const playlistId = url.split('?')[0].split('playlist/')[1]; 
     const apiUrl = `https://api.spotify.com/v1/playlists/${playlistId}`;
     let finalToken = token;
 
     try {
-        console.log("Current token being used: ", token);
+        console.log("Current token being used:\n", token);
         console.log("Validating playlist link...");
         // Link validation
         if (!url || !url.includes('open.spotify.com')) {
@@ -17,7 +17,7 @@ async function getPlaylist(token, url) {
         }
 
         // Getting playlist data
-        const data = await fetchPlaylist(finalToken, apiUrl, 0);
+        const data = await fetchPlaylist(finalToken, setToken, apiUrl, 0);
         const songData = data.tracks.items;
 
         let songs = '';
@@ -96,7 +96,7 @@ function msToString(ms, numColons) {
     return null;
 }
 
-async function fetchPlaylist(token, apiUrl, attempt) {
+async function fetchPlaylist(token, setToken, apiUrl, attempt) {
     const res = await fetch(apiUrl, {
         headers: {
             'Authorization': `Bearer ${token}`
@@ -112,12 +112,13 @@ async function fetchPlaylist(token, apiUrl, attempt) {
     // Dealing with errors on failure
     const message = await res.text();
     if (message.includes("expired")) {
-        if (attempt < 1) {
+        if (attempt < 1) {  
             console.log("Token expired - getting new token...");
             const tokenData = await getRefreshToken();
-            return fetchPlaylist(tokenData.token, apiUrl, attempt+1);
+            setToken(tokenData.token);
+            return fetchPlaylist(tokenData.token, setToken, apiUrl, attempt+1);
         }
-        throw { status: res.status, message: "Token expired - refresh unsuccessful" };
+        throw { status: res.status, message: "Token expired - refresh unsuccessful" }; 
     }
     
     else {

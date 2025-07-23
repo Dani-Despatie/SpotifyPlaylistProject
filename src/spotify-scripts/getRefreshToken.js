@@ -27,7 +27,7 @@ async function getRefreshToken() {
     }
 
     const data = await res.json();
-    console.log("New token: ", data.access_token);
+    console.log("New token:\n", data.access_token);
     
     window.localStorage.setItem('access_token', data.access_token);
     window.localStorage.setItem('refresh_token', data.refresh_token);
